@@ -12,6 +12,7 @@
 | ケースA | YouTube ホーム → 検索で動画を開く（SPA遷移）→ **コメント欄**のタイムスタンプをクリック |
 | ケースB | 動画を直接開く → **コメント欄**のタイムスタンプをクリック |
 | ケースC | 動画を直接開く → **概要欄(description)**のタイムスタンプをクリック |
+| ケースD | **ライブアーカイブ(`/live/VIDEO_ID`)** を直接開く → **コメント欄**のタイムスタンプをクリック |
 
 **成功条件はただ一つ:「タイムスタンプをクリックしてもページが先頭へスクロールしないこと」**
 （リンクが見える程度にページを下方へスクロールした状態でクリックし、クリック後も
@@ -71,16 +72,22 @@ npm run report
 
 ```bash
 # 例: 別の動画を対象にする
-VIDEO_ID=xxxxxxxxxxx npm run test:e2e
+WATCH_VIDEO_ID=xxxxxxxxxxx npm run test:e2e
 
-# ケースA の検索クエリも変えたい場合（既定は VIDEO_ID と同じ）
-VIDEO_ID=xxxxxxxxxxx SEARCH_QUERY="動画タイトル" npm run test:e2e
+# ケースA の検索クエリも変えたい場合（既定は WATCH_VIDEO_ID と同じ）
+WATCH_VIDEO_ID=xxxxxxxxxxx SEARCH_QUERY="動画タイトル" npm run test:e2e
+
+# 例: ケースD（/live）の対象を指定して実行
+LIVE_VIDEO_ID=xxxxxxxxxxx npm run test:e2e
 ```
 
-- `VIDEO_ID`: 対象動画の ID（`watch?v=` の後ろ）。**コメント欄・概要欄の両方にタイムスタンプ付き
+- `WATCH_VIDEO_ID`: 対象動画の ID（`watch?v=` の後ろ）。**コメント欄・概要欄の両方にタイムスタンプ付き
   リンクがある動画**を選んでください。
 - `SEARCH_QUERY`: ケースA でホームから動画へ遷移するための検索語。既定は動画ID
   （ID で検索すると当該動画が結果に出るため）。ヒットしにくい場合は動画タイトルを指定します。
+- `LIVE_VIDEO_ID`: ケースD（`/live/VIDEO_ID` 形式のライブアーカイブ）の対象動画ID。
+  既定は `1J_9-rpdPzw`（`https://www.youtube.com/live/1J_9-rpdPzw`）。別のライブアーカイブで
+  試す場合に上書きします。コメント欄にタイムスタンプ付きリンクがあるものを選んでください。
 
 ## 仕組み（ファイル構成）
 
@@ -90,7 +97,7 @@ tests/
   fixtures/extension.js       … 拡張をロードした Chromium を起動するフィクスチャ
   helpers.js                  … 同意ダイアログ処理 / コメント・概要欄の展開 /
                                 タイムスタンプ検出 / スクロール判定
-  timestamp-scroll.spec.js    … ケースA / B / C の本体
+  timestamp-scroll.spec.js    … ケースA / B / C / D の本体
 ```
 
 ## うまくいかないとき

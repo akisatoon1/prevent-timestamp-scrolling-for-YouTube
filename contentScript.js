@@ -1,34 +1,60 @@
 "use strict";
 
 document.addEventListener("click", (event) => {
-    if (location.pathname === "/watch") {
-        const videoID = location.search.slice(3, 14);
+    if (!isTargetPage()) return;
 
-        const targetEle = event.target;
+    const videoID = getCurrentVideoId();
+    if (!videoID) return;
 
-        // if timestamp, handle timestamp
-        if (isTimestamp(targetEle)) {
-            const linkEle = toOriginal(targetEle);
-            if (isOnThisVideo(videoID, linkEle)) {
-                const time = getTime(linkEle);
-                changeVideoTime(time);
-                preventScrolling(event);
-                log(time);
-                return;
-            }
-        }
+    const targetEle = event.target;
 
-        // chapter
-        const endpoint = getEndpoint(videoID, toOriginal(targetEle));
-        if (endpoint) {
-            const time = getTime(endpoint);
+    // if timestamp, handle timestamp
+    if (isTimestamp(targetEle)) {
+        const linkEle = toOriginal(targetEle);
+        if (isOnThisVideo(videoID, linkEle)) {
+            const time = getTime(linkEle);
             changeVideoTime(time);
             preventScrolling(event);
             log(time);
             return;
         }
     }
+
+    // chapter
+    const endpoint = getEndpoint(videoID, toOriginal(targetEle));
+    if (endpoint) {
+        const time = getTime(endpoint);
+        changeVideoTime(time);
+        preventScrolling(event);
+        log(time);
+        return;
+    }
 }, { capture: true })
+
+// /watch /liveページのどちらかであるときのみ拡張機能が発動するため
+function isTargetPage() {
+    return location.pathname === "/watch" || location.pathname.startsWith("/live/");
+}
+
+// 現在のページの動画IDを返す。対応ページでなければ null を返す。
+function getCurrentVideoId() {
+    return getVideoIdFromUrl(location.href);
+}
+
+// URL(絶対/相対)から動画IDを返す。/watch?v=ID と /live/ID の両形式に対応。
+// 取得できなければ null。
+function getVideoIdFromUrl(url) {
+    try {
+        const u = new URL(url, "https://www.youtube.com/watch");
+        if (u.pathname === "/watch") return u.searchParams.get("v");
+        if (u.pathname.startsWith("/live/")) return u.pathname.split("/")[2] || null;
+        return null;
+    } catch (err) {
+        if (err instanceof TypeError) return null;
+        handleUnexpectedErr(err);
+        return null;
+    }
+}
 
 //
 // endpointとはvideoのタイム付きのリンク
@@ -41,7 +67,7 @@ function isEndpoint(videoId, ele) {
     return (ele &&
         ele.tagName === "A" &&
         ele.getAttribute("id") === "endpoint" &&
-        getParam(ele.getAttribute("href"), "v") === videoId &&
+        getVideoIdFromUrl(ele.getAttribute("href")) === videoId &&
         getParam(ele.getAttribute("href"), "t") !== null
     );
 }
@@ -82,13 +108,13 @@ function isTimestamp(ele) {
 }
 
 // 別動画へのタイムスタンプもあるため
-// timestamp link's 'href' field value must have param as 'v=[videoId]'
+// timestamp link's 'href' must point to this video
+// (/watch?v=[videoId] または /live/[videoId] 形式)
 function isOnThisVideo(videoId, ele) {
     const url = ele.getAttribute("href");
     if (url === null) return false;
 
-    if (getParam(url, "v") === videoId) return true;
-    else return false;
+    return getVideoIdFromUrl(url) === videoId;
 }
 
 // if web translation

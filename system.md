@@ -6,7 +6,7 @@ flowchart TB
     end
 
     subgraph Script["拡張スクリプト (JavaScript)"]
-        Listener["イベント監視モジュール<br>document.addEventListener<br>/watch ページ判定"]
+        Listener["イベント監視モジュール<br>document.addEventListener<br>/watch・/live ページ判定"]
         
         subgraph Logic["判定抽出ロジック"]
             direction TB
