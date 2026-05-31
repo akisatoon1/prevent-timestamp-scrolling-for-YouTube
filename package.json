@@ -6,6 +6,10 @@
   "scripts": {
     "test:e2e": "playwright test --headed",
     "test:e2e:ui": "playwright test --ui",
+    "test:e2e:a": "playwright test --headed -g ケースA",
+    "test:e2e:b": "playwright test --headed -g ケースB",
+    "test:e2e:c": "playwright test --headed -g ケースC",
+    "test:e2e:d": "playwright test --headed -g ケースD",
     "report": "playwright show-report"
   },
   "devDependencies": {

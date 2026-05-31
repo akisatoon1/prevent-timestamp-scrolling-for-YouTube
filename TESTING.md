@@ -46,6 +46,29 @@ npm run test:e2e
 - 「ホーム→検索→動画→タイムスタンプをクリック」の流れがそのまま見えます。
 - 3 ケースが順番に実行されます。
 
+### 1-2. ケースを個別に実行
+
+特定のケースだけ実行したいときは、専用スクリプトを使います:
+
+```bash
+npm run test:e2e:a   # ケースA のみ
+npm run test:e2e:b   # ケースB のみ
+npm run test:e2e:c   # ケースC のみ
+npm run test:e2e:d   # ケースD のみ（/live ライブアーカイブ）
+```
+
+環境変数（`WATCH_VIDEO_ID` / `LIVE_VIDEO_ID` など）と併用できます:
+
+```bash
+LIVE_VIDEO_ID=xxxxxxxxxxx npm run test:e2e:d
+```
+
+任意の文言で絞り込みたい場合は `-g`（grep）を直接指定もできます:
+
+```bash
+npx playwright test --headed -g ケースD
+```
+
 ### 2. UI モード（ステップごとに確認・デバッグ）
 
 ```bash
