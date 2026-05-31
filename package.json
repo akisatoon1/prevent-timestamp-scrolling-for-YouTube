@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "name": "prevent-timestamp-scrolling-e2e",
+  "version": "1.0.0",
+  "description": "E2E tests for the 'prevent timestamp scrolling for YouTube' extension",
+  "scripts": {
+    "test:e2e": "playwright test --headed",
+    "test:e2e:ui": "playwright test --ui",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}
